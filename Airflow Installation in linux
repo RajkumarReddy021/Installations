@@ -1,0 +1,50 @@
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+
+sudo apt update
+
+sudo apt install python3.10 python3.10-venv python3.10-dev
+
+python3.10 -m venv airflow_venv
+
+source airflow_venv/bin/activate
+
+export AIRFLOW_VERSION=2.7.0
+
+export PYTHON_VERSION="3.10"
+
+export CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+
+pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+sudo -i -u postgres
+psql
+CREATE DATABASE airflow;
+CREATE USER airflow WITH PASSWORD 'your_password';
+ALTER ROLE airflow SET client_encoding TO 'utf8';
+ALTER ROLE airflow SET default_transaction_isolation TO 'read committed';
+ALTER ROLE airflow SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+\q
+exit
+
+
+airflow db init
+airflow users create \
+    --username admin \
+    --firstname Admin \
+    --lastname User \
+    --role Admin \
+    --email admin@example.com \
+    --password admin
+airflow webserver --port 8080
+open new terminal
+
+source ~/airflow-practice/airflow_venv/bin/activate
+pip show apache-airflow
+which airflow
+airflow scheduler
+http://43.205.237.22:8080
